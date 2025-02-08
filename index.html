@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,11 +13,13 @@
         .search-container {
             margin-bottom: 20px;
         }
+
         .user-count {
             margin-bottom: 10px;
         }
     </style>
 </head>
+
 <body>
     <div class="container mt-5">
         <h1 class="text-center mb-4">Usuarios Registrados</h1>
@@ -29,10 +32,11 @@
 
         <!-- Barra de búsqueda -->
         <div class="search-container text-center">
-            <input type="text" id="search-input" class="form-control w-50 mx-auto" placeholder="Buscar por nombre o correo electrónico...">
+            <input type="text" id="search-input" class="form-control w-50 mx-auto"
+                placeholder="Buscar por nombre o correo electrónico...">
         </div>
 
-        <div >
+        <div>
             <a class="btn btn-primary" href="index.html">Recargar Usuarios</a>
         </div>
         <br>
@@ -45,6 +49,7 @@
                     <th>Nombre</th>
                     <th>Correo Electrónico</th>
                     <th>Fecha de Registro</th>
+                    <th>Eliminar</th>
                 </tr>
             </thead>
             <tbody id="user-table-body">
@@ -107,6 +112,9 @@
                             <td>${usuario.nombre}</td>
                             <td>${usuario.correo}</td>
                             <td>${usuario.fecha_registro}</td>
+                            <td>
+                                <button class="btn btn-danger btn-sm" onclick="deleteUser(${usuario.id})">Eliminar</button>
+                            </td>
                         </tr>
                     `;
                     tableBody.innerHTML += row;
@@ -138,8 +146,35 @@
             });
         }
 
+        async function deleteUser(userId) {
+            if (!confirm("¿Seguro que deseas eliminar este usuario?")) return;
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ id: userId }) // Enviamos el ID al backend
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert("Usuario eliminado correctamente.");
+                    loadUsers(); // Recargar la lista de usuarios
+                } else {
+                    alert("Error al eliminar el usuario.");
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                alert("Hubo un problema al eliminar el usuario.");
+            }
+        }
+
         // Cargar los usuarios cuando la página se cargue
         document.addEventListener('DOMContentLoaded', loadUsers);
     </script>
 </body>
+
 </html>
